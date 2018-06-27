@@ -6,6 +6,6 @@ https://devs.dev.alor.ru
 
 Пожалуйста, обратите внимание. Если вы используете этот механизм в SPA, мобильных или 
 нативных приложениях и соответсвенно не можете поддерживать секрет - не отправляйте 
-его. Подробней о можете почитать тут https://www.oauth.com/oauth2-servers/oauth2-clients/mobile-and-native-apps/
+его. Подробней о можете почитать тут https://www.oauth.com/oauth2-servers/oauth2-clients/single-page-apps/
 
 
