@@ -1,9 +1,12 @@
+var cors = require('cors')
 var request = require('request');
 var path = require('path');
 var express = require('express'),
     app = express();
 
 var OAuth2;
+
+app.use(cors())
 
 var credentialsAlor = {
     client: {
@@ -27,8 +30,8 @@ app.get('/', function(request, response){
     
     OAuth2 = require('simple-oauth2').create(credentialsAlor);
     authorization_uri = OAuth2.authorizationCode.authorizeURL({
-        redirect_uri: 'http://localhost:3001/callback',
-        scope: 'orders trades personal trading',
+        redirect_uri: 'http://10.85.85.56:3001/callback',
+        scope: 'ordersread trades personal trades',
         state: state
     });
     const tpl = `
@@ -44,38 +47,33 @@ app.get('/', function(request, response){
 });
 
 // Callback endpoint parsing the authorization token and asking for the access token
-app.get('/callback', function (req, res) {
+app.get('/callback', async function (req, res) {
     var code = req.query.code;
- 
-    OAuth2.AuthCode.getToken({
+    const tokenConfig = {
         code: code,
-        redirect_uri: 'http://localhost:3001/callback'
-    }, saveToken);
- 
-    function saveToken(error, result) {
-        if (error) {
-            console.log('Access Token Error', error.message, error);
-            res.json({'Access Token Error': error.message});
-        } else {
-            //see what we've got...
-            console.log(result);
-            //this adds the expiry time to the token by adding the validity time to the token
-            token = OAuth2.AccessToken.create(result);
-            //save the response back from the token endpoint in a session
-            req.session.token = result;
- 
-            //perform the res of the processing now that we have an Access Token
-            gotToken(req,res);
-        }
-    }
+        redirect_uri: 'http://10.85.85.56:3001/callback',
+        client_id: credentialsAlor.client.id
+      };
 
-    //Now the token has been received and saved in the session, return the next page for processing
-    function gotToken(req, res) {
-        res.sendfile(__dirname +"/public/main.html");
-    };
- 
+      try {
+        const result = await OAuth2.authorizationCode.getToken(tokenConfig);
+        const tokenResp = OAuth2.accessToken.create(result);
+        console.log(tokenResp.token.access_token);
+        const tpl = `
+        <html>
+            <h4>Ouath client app example</h4>
+            <p><b>Success</b></p>
+            <p>Acess Token: ${tokenResp.token.access_token}</p
+            <p>Refresh Token: ${tokenResp.token.refresh_token}</p
+        </html>
+        `;
+        res.send(tpl);
+
+      } catch (error) {
+        res.send('Access Token Error', error.message);
+      }
 });
- 
+
 app.listen(3001);
  
 console.log("OAuth Client started on port 3001");
