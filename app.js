@@ -5,19 +5,22 @@ const cors = require('cors'),
 
 const credentialsAlor = {
   client: {
-      id: '8576e3ed958840efac64',
-      secret: 'Twy+YPIW3BaQId3PcMv7yF91hkGv0AGxRNpNcUUaTBg=',
+      // Идентификатор приложения. Считается публичной информацией
+      id: '8576e3ed958840efac64', 
+      // Секретный ключ приложения. Считается приватной информацией
+      secret: 'Twy+YPIW3BaQId3PcMv7yF91hkGv0AGxRNpNcUUaTBg=', 
     },
     auth: {
-      tokenHost: 'http://oauth.dev.alor.ru',
+      // Для боевого контура httpS://oauth.alor.ru
+      tokenHost: 'http://oauth.dev.alor.ru', 
       tokenPath: '/token',
       authorizePath: '/authorize',
     }
 };
 
 const OAuth2 = simpleOAuth.create(credentialsAlor);
-
-app.use(cors());
+// CORS на все домены, пожалуйста не забудьте удалить или настройть по необходимости
+app.use(cors()); 
 
 app.get('/', function (req, res) {
   let state = '';
@@ -28,8 +31,11 @@ app.get('/', function (req, res) {
   }
   
   authorization_uri = OAuth2.authorizationCode.authorizeURL({
-    redirect_uri: 'http://10.85.85.56:3001/callback',
+    // Тот же URL, который вы указывали при создании приложения. На бою - обязательно httpS
+    redirect_uri: 'http://10.85.85.56:3001/callback', 
+    // Права, которые требуются вашему приложению для функционирования
     scope: 'ordersread trades personal trades',
+    // Состояние, с помощью которого вы сможете определить клиента вернувшегося по редиректу
     state
   });
 
@@ -45,13 +51,15 @@ app.get('/', function (req, res) {
   res.send(tpl);
 });
 
-// Callback endpoint parsing the authorization token and asking for the access token
+// Колбэк, который получает токены по коду авторизации
 app.get('/callback', async function (req, res) {
   const code = req.query.code;
   const tokenConfig = {
       code,
+      // Опять же, на бою обязательно httpS
       redirect_uri: 'http://10.85.85.56:3001/callback',
-      client_id: credentialsAlor.client.id
+      client_id: credentialsAlor.client.id,
+      client_secret: credentialsAlor.client.secret
     };
 
   try {
