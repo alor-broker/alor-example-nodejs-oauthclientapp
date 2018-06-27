@@ -53,6 +53,10 @@ app.get('/', function (req, res) {
 
 // Колбэк, который получает токены по коду авторизации
 app.get('/callback', async function (req, res) {
+  if(req.query.error){
+      res.send(req.query.error);
+      return;
+  }
   const code = req.query.code;
   const tokenConfig = {
       code,
