@@ -12,7 +12,7 @@ const credentialsAlor = {
   },
   auth: {
     // Для боевого контура httpS://oauth.alor.ru
-    tokenHost: 'https://oauthdev.alor.ru/',
+    tokenHost: 'https://oauthdev.alor.ru',
     tokenPath: '/token',
     authorizePath: '/authorize',
   }
